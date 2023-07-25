@@ -22,19 +22,20 @@ const CurrencyExchangeRates = () => {
       )
       .then((response) => {
         const responseData = response.data;
-        if (responseData.length === 0) {
-          // If no records found, clear the data and show the error message
+        if (responseData.error) {
+          setError(responseData.error);
           setData([]);
-          setError('No records found for the specified date range.');
         } else {
           setData(responseData);
           setError(null);
         }
       })
       .catch((error) => {
-        console.error('Error fetching data:', error);
+        console.error('No records found for the specified date range:', error);
         setLoading(false);
-        setError('Error fetching data. Please try again later.');
+        setError(
+          'No records found for the specified date range. Please try again later.'
+        );
       })
       .finally(() => {
         setLoading(false);
@@ -52,8 +53,19 @@ const CurrencyExchangeRates = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const getRowColorClass = (data) => {
+    if (data.symbol === 'USD') {
+      return 'bg-yellow-200';
+    } else if (data.e_rate.beli > 10000) {
+      return 'bg-green-200';
+    } else if (data.tt_counter.jual < 14000) {
+      return 'bg-red-200';
+    }
+    return '';
+  };
+
   return (
-    <div className='container mt-4'>
+    <div className='container mx-auto px-4 mt-8'>
       <h1 className='text-3xl mb-4'>Currency Exchange Rates</h1>
       <div className='mb-4'>
         <div className='flex items-center'>
@@ -74,7 +86,7 @@ const CurrencyExchangeRates = () => {
         </div>
         <button
           onClick={fetchData}
-          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
+          className='mt-4 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600'
         >
           Fetch Data
         </button>
@@ -83,41 +95,60 @@ const CurrencyExchangeRates = () => {
         <div>Loading...</div>
       ) : error ? (
         <div className='text-red-600 mb-4'>
-          {error}
-          <button
-            onClick={fetchData}
-            className='ml-4 px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600'
-          >
-            Try Again
-          </button>
+          {error === 'No records found for the specified date range' ? (
+            <p>{error}</p>
+          ) : (
+            <>
+              Error: {error}
+              <button
+                onClick={fetchData}
+                className='ml-4 px-2 py-1 text-white bg-blue-500 rounded hover:bg-blue-600'
+              >
+                Try Again
+              </button>
+            </>
+          )}
         </div>
       ) : (
-        <div className='overflow-x-auto'>
+        <div className='overflow-x-auto mt-8'>
           <div className='min-w-full'>
-            <table className='min-w-full divide-y divide-gray-200'>
+            <table className='min-w-full divide-y divide-gray-200 border border-gray-300'>
               <thead className='bg-gray-50'>
                 <tr>
-                  <th className='px-4 py-2 text-left'>Symbol</th>
-                  <th className='px-4 py-2 text-left'>E-Rate (Buy)</th>
-                  <th className='px-4 py-2 text-left'>E-Rate (Sell)</th>
-                  <th className='px-4 py-2 text-left'>TT Counter (Buy)</th>
-                  <th className='px-4 py-2 text-left'>TT Counter (Sell)</th>
-                  <th className='px-4 py-2 text-left'>Bank Notes (Buy)</th>
-                  <th className='px-4 py-2 text-left'>Bank Notes (Sell)</th>
-                  <th className='px-4 py-2 text-left'>Date</th>
+                  <th className='border px-4 py-3 text-left'>Symbol</th>
+                  <th className='border px-4 py-3 text-left'>E-Rate (Buy)</th>
+                  <th className='border px-4 py-3 text-left'>E-Rate (Sell)</th>
+                  <th className='border px-4 py-3 text-left'>
+                    TT Counter (Buy)
+                  </th>
+                  <th className='border px-4 py-3 text-left'>
+                    TT Counter (Sell)
+                  </th>
+                  <th className='border px-4 py-3 text-left'>
+                    Bank Notes (Buy)
+                  </th>
+                  <th className='border px-4 py-3 text-left'>
+                    Bank Notes (Sell)
+                  </th>
+                  <th className='border px-4 py-3 text-left'>Date</th>
                 </tr>
               </thead>
               <tbody>
                 {data.map((item, index) => (
-                  <tr key={index}>
-                    <td className='px-4 py-2'>{item.symbol}</td>
-                    <td className='px-4 py-2'>{item.e_rate.beli}</td>
-                    <td className='px-4 py-2'>{item.e_rate.jual}</td>
-                    <td className='px-4 py-2'>{item.tt_counter.beli}</td>
-                    <td className='px-4 py-2'>{item.tt_counter.jual}</td>
-                    <td className='px-4 py-2'>{item.bank_notes.beli}</td>
-                    <td className='px-4 py-2'>{item.bank_notes.jual}</td>
-                    <td className='px-4 py-2'>
+                  <tr
+                    key={index}
+                    className={`${getRowColorClass(item)} ${
+                      index % 2 === 0 ? 'bg-gray-100' : 'bg-white'
+                    }`}
+                  >
+                    <td className='border px-4 py-3'>{item.symbol}</td>
+                    <td className='border px-4 py-3'>{item.e_rate.beli}</td>
+                    <td className='border px-4 py-3'>{item.e_rate.jual}</td>
+                    <td className='border px-4 py-3'>{item.tt_counter.beli}</td>
+                    <td className='border px-4 py-3'>{item.tt_counter.jual}</td>
+                    <td className='border px-4 py-3'>{item.bank_notes.beli}</td>
+                    <td className='border px-4 py-3'>{item.bank_notes.jual}</td>
+                    <td className='border px-4 py-3'>
                       {new Date(item.date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: '2-digit',
