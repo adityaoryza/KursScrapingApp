@@ -14,26 +14,17 @@ const IndexingPage = () => {
       .get('https://typescript-api-alpha.vercel.app/api/v1/indexing')
       .then((response) => {
         setLoading(false);
-        setSuccess(true);
+        if (
+          response.data.message === 'Data for the current date already exists'
+        ) {
+          setSuccess(true);
+        } else {
+          setSuccess(false);
+        }
       })
       .catch((error) => {
         setLoading(false);
-        if (
-          error.response &&
-          error.response.data &&
-          error.response.data.error
-        ) {
-          const errorMessage = error.response.data.error;
-          if (errorMessage === 'Data for the current date already exists') {
-            setError(
-              'Data for the current date already exists. Try again tomorrow.'
-            );
-          } else {
-            setError('An error occurred while scraping and indexing.');
-          }
-        } else {
-          setError('An error occurred while scraping and indexing.');
-        }
+        setError('An error occurred while scraping and indexing.');
       });
   };
 
@@ -42,13 +33,22 @@ const IndexingPage = () => {
       <div className='row justify-content-center'>
         <div className='col-md-6 text-center'>
           <h1 className='mb-4'>Scraping and Indexing</h1>
-          {!loading && !success && (
-            <button onClick={handleScrapeAndIndex} className='btn btn-primary'>
-              Start Scraping
-            </button>
+          <button
+            onClick={handleScrapeAndIndex}
+            className='btn btn-primary'
+            disabled={loading}
+          >
+            {loading
+              ? 'Loading...'
+              : success
+              ? 'Scraping Success!'
+              : 'Start Scraping'}
+          </button>
+          {success && (
+            <p className='text-success mt-3'>
+              Scraping and indexing succeeded!
+            </p>
           )}
-          {loading && <p>Loading...</p>}
-          {success && <p className='text-success'>Scraping Success!</p>}
           {error && <p className='text-danger mt-3'>{error}</p>}
         </div>
       </div>
