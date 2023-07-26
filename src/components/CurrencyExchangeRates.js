@@ -1,18 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const CurrencyExchangeRates = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [startDate, setStartDate] = useState(new Date('2023-05-29'));
-  const [endDate, setEndDate] = useState(new Date('2023-07-24'));
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const fetchData = useCallback(() => {
-    setLoading(true);
+  const fetchData = () => {
+    if (!startDate || !endDate) {
+      setError('Please select start and end dates.');
+      return;
+    }
+
     setError(null);
+    setLoading(true);
 
     axios
       .get(
@@ -32,7 +37,6 @@ const CurrencyExchangeRates = () => {
       })
       .catch((error) => {
         console.error('No records found for the specified date range:', error);
-        setLoading(false);
         setError(
           'No records found for the specified date range. Please try again later.'
         );
@@ -40,11 +44,7 @@ const CurrencyExchangeRates = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  };
 
   const formatDate = (date) => {
     const year = date.getFullYear();
@@ -74,6 +74,8 @@ const CurrencyExchangeRates = () => {
             selected={startDate}
             onChange={(date) => setStartDate(date)}
             className='form-control'
+            isClearable
+            placeholderText='Select Start Date'
           />
         </div>
         <div className='d-flex align-items-center mt-2'>
@@ -82,6 +84,8 @@ const CurrencyExchangeRates = () => {
             selected={endDate}
             onChange={(date) => setEndDate(date)}
             className='form-control'
+            isClearable
+            placeholderText='Select End Date'
           />
         </div>
         <button onClick={fetchData} className='mt-4 btn btn-success'>
