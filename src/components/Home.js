@@ -6,7 +6,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get('https://typescript-api-alpha.vercel.app/api/v1/')
+      .get('https://typescript-scraping-api.vercel.app/api/v1/')
       .then((response) => setMessage(response.data.message))
       .catch((error) => console.error('Error fetching data:', error));
   }, []);

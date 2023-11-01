@@ -20,7 +20,7 @@ const DeleteDataByDate = () => {
 
     axios
       .delete(
-        `https://typescript-api-alpha.vercel.app/api/v1/kurs/${formatDate(
+        `https://typescript-scraping-api.vercel.app/api/v1/kurs/${formatDate(
           selectedDate
         )}`
       )

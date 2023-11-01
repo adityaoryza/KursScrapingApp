@@ -21,7 +21,7 @@ const CurrencyExchangeRates = () => {
 
     axios
       .get(
-        `https://typescript-api-alpha.vercel.app/api/v1/kurs?startdate=${formatDate(
+        `https://typescript-scraping-api.vercel.app/api/v1/kurs?startdate=${formatDate(
           startDate
         )}&enddate=${formatDate(endDate)}`
       )

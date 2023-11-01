@@ -11,7 +11,7 @@ const IndexingPage = () => {
     setError(null);
 
     axios
-      .get('https://typescript-api-alpha.vercel.app/api/v1/indexing')
+      .get('https://typescript-scraping-api.vercel.app/api/v1/indexing')
       .then((response) => {
         setLoading(false);
         if (
